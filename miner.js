@@ -7,7 +7,9 @@ var account='ваш аккаунт без @';
 var wif ='ваш приватный постинг ключ'; 
 var link='ваш url поста под которым размещать комментарии';
 var interlived=23;//время в секундах между комментариями
+var votepower=90;//значение Voting Power (заряда батарейки) при котором робот деактивируется
 var timerId = setInterval(function() {
+vp();
 posting();
 }, +interlived*1000);
 
@@ -31,5 +33,25 @@ if(err){console.log(err); }  else {
 });
 }
 });
+};
 
+function vp(){
+golos.api.getAccounts([account], function(err, result){
+	var power = result[0].voting_power;
+	var votetime = Date.parse(result[0].last_vote_time);
+		golos.api.getDynamicGlobalProperties(function(err, result) {  
+			var curtime = Date.parse(result.time);
+			golos.api.getConfig(function(err, result) {
+				var regentime = 10000/result.STEEMIT_VOTE_REGENERATION_SECONDS;
+			var volume =(power+((curtime-votetime)/1000)*regentime);
+			var charge;
+			if(volume>=10000){
+			charge=100.00;
+			}
+			else charge=+(volume/100).toFixed(2);
+			if(charge<=votepower){console.log('Текущий Уровень заряда VP '+'('+charge+'%)'+' меньше допустимого: '+votepower+'%'+'\nРобот деактивирован');process.exit(-1);}
+			console.log('Уровень заряда VP: '+charge+'%');
+	});
+	});	
+	});
 };
