@@ -10,7 +10,6 @@ var interlived=23;//время в секундах между комментар
 var votepower=90;//значение Voting Power (заряда батарейки) при котором робот деактивируется
 var timerId = setInterval(function() {
 vp();
-posting();
 }, +interlived*1000);
 
 function posting(){
@@ -50,7 +49,8 @@ golos.api.getAccounts([account], function(err, result){
 			}
 			else charge=+(volume/100).toFixed(2);
 			if(charge<=votepower){console.log('Текущий Уровень заряда VP '+'('+charge+'%)'+' меньше допустимого: '+votepower+'%'+'\nРобот деактивирован');process.exit(-1);}
-			console.log('Уровень заряда VP: '+charge+'%');
+			else {posting();
+			      console.log('Уровень заряда VP: '+charge+'%');}
 	});
 	});	
 	});
